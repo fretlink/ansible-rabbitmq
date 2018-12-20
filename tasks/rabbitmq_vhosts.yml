@@ -5,3 +5,4 @@
     state: "{{ item['state'] }}"
   with_items: "{{ rabbitmq_extra_vhosts }}"
   run_once: "{{ rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering }}"
+  delegate_to: "{{ rabbitmq_master|default(omit) }}"
