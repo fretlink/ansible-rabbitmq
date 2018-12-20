@@ -10,15 +10,14 @@
     tags: "{{ item['tags']|default(omit) }}"
     permissions: "{{ item['permissions']|default(omit) }}"
     state: present
+  run_once: rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering
+  delegate_to: "{{ rabbitmq_master|default(omit) }}"
   become: true
   with_items: "{{ rabbitmq_users }}"
-  when: >
-        (rabbitmq_enable_clustering is defined and
-          not rabbitmq_enable_clustering) or
-          rabbitmq_enable_clustering is not defined
+  when: rabbitmq_debian_version is version('3.7.9', '<')
 
-- name: rabbitmq_users | creating rabbitmq users
-  rabbitmq_user:
+- name: rabbitmq_users | creating rabbitmq users (rabbit >= 3.7.9)
+  rabbitmq_user_3_7_9:
     name: "{{ item['name'] }}"
     password: "{{ item['password'] }}"
     vhost: "{{ item['vhost']|default(omit) }}"
@@ -28,10 +27,8 @@
     tags: "{{ item['tags']|default(omit) }}"
     permissions: "{{ item['permissions']|default(omit) }}"
     state: present
-  run_once: yes
-  delegate_to: "{{ rabbitmq_master }}"
+  run_once: rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering
+  delegate_to: "{{ rabbitmq_master|default(omit) }}"
   become: true
   with_items: "{{ rabbitmq_users }}"
-  when: >
-        rabbitmq_enable_clustering is defined and
-          rabbitmq_enable_clustering
+  when: rabbitmq_debian_version is version('3.7.9', '>=')
